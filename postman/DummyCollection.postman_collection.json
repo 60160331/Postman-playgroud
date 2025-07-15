@@ -1,0 +1,465 @@
+{
+	"info": {
+		"_postman_id": "0f8048cd-ba5b-4874-8a61-e6bba8b16f2b",
+		"name": "DummyCollection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44232922",
+		"_collection_link": "https://kitz-8389427.postman.co/workspace/learning-API~1b86f3f8-a952-4ed7-8f97-ff5f3c939c31/collection/44232922-0f8048cd-ba5b-4874-8a61-e6bba8b16f2b?action=share&source=collection_link&creator=44232922"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.sendRequest({\r",
+							"    url: 'https://dummyjson.com/auth/login',\r",
+							"    method: 'POST',\r",
+							"    header: {\r",
+							"        'Content-Type': 'application/json'\r",
+							"    },\r",
+							"    body: {\r",
+							"        mode: 'raw',\r",
+							"        raw: JSON.stringify({\r",
+							"            username: 'emilys',\r",
+							"            password: 'emilyspass'\r",
+							"        })\r",
+							"    }\r",
+							"}, function (err, res) {\r",
+							"    let json = res.json();\r",
+							"    pm.environment.set('token', json.accessToken);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let res = pm.response.json();\r",
+							"pm.environment.set(\"token\", res.accessToken); // เก็บ token\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response has accessToken\", function () {\r",
+							"    const res = pm.response.json();\r",
+							"    pm.expect(res).to.have.property(\"accessToken\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"accessToken is not empty\", function () {\r",
+							"    const res = pm.response.json();\r",
+							"    pm.expect(res.accessToken).to.not.be.empty;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"เทสว่า response ใช้เวลาไม่เกิน 20000 ms\",function(){\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"เทสว่า response มี property ชื่อ email อยู่ด้วย\",function(){\r",
+							"    const res = pm.response.json();\r",
+							"    pm.expect(res).to.have.property(\"email\");\r",
+							"});\r",
+							"pm.test(\"Your gender\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.gender).to.eql(\"female\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer  {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"emilys\",\r\n    \"password\": \"emilyspass\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/auth/login",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getUser",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"if (!pm.environment.get(\"token\")) {\r",
+							"    console.log(\"🔐 Logging in to get new token...\");\r",
+							"\r",
+							"    pm.sendRequest({\r",
+							"        url: 'https://dummyjson.com/auth/login',\r",
+							"        method: 'POST',\r",
+							"        header: { 'Content-Type': 'application/json' },\r",
+							"        body: {\r",
+							"            mode: 'raw',\r",
+							"            raw: JSON.stringify({\r",
+							"                username: 'emilys',\r",
+							"                password: 'emilyspass'\r",
+							"            })\r",
+							"        }\r",
+							"    }, function (err, res) {\r",
+							"        if (!err) {\r",
+							"            let json = res.json();\r",
+							"            pm.environment.set('token', json.accessToken);\r",
+							"            console.log(\"✅ Token set!\");\r",
+							"        } else {\r",
+							"            console.error(\"❌ Login failed\", err);\r",
+							"        }\r",
+							"    });\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/users/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"users",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add a new user",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (!pm.environment.get(\"token\")) {\r",
+							"    console.log(\"🔐 Logging in to get new token...\");\r",
+							"\r",
+							"    pm.sendRequest({\r",
+							"        url: 'https://dummyjson.com/auth/login',\r",
+							"        method: 'POST',\r",
+							"        header: { 'Content-Type': 'application/json' },\r",
+							"        body: {\r",
+							"            mode: 'raw',\r",
+							"            raw: JSON.stringify({\r",
+							"                username: 'emilys',\r",
+							"                password: 'emilyspass'\r",
+							"            })\r",
+							"        }\r",
+							"    }, function (err, res) {\r",
+							"        if (!err) {\r",
+							"            let json = res.json();\r",
+							"            pm.environment.set('token', json.accessToken);\r",
+							"            console.log(\"✅ Token set!\");\r",
+							"        } else {\r",
+							"            console.error(\"❌ Login failed\", err);\r",
+							"        }\r",
+							"    });\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer  {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"{{$randomFirstName}}\",\r\n    \"lastName\": \"{{$randomLastName}}\",\r\n    \"age\": 20,\r\n    \"eyeColor\": \"{{$randomColor}}\"\r\n    /* other user data */\r\n  }\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/users/add",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"users",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateSumUser",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"if (!pm.environment.get(\"token\")) {\r",
+							"    console.log(\"🔐 Logging in to get new token...\");\r",
+							"\r",
+							"    pm.sendRequest({\r",
+							"        url: 'https://dummyjson.com/auth/login',\r",
+							"        method: 'POST',\r",
+							"        header: { 'Content-Type': 'application/json' },\r",
+							"        body: {\r",
+							"            mode: 'raw',\r",
+							"            raw: JSON.stringify({\r",
+							"                username: 'emilys',\r",
+							"                password: 'emilyspass'\r",
+							"            })\r",
+							"        }\r",
+							"    }, function (err, res) {\r",
+							"        if (!err) {\r",
+							"            let json = res.json();\r",
+							"            pm.environment.set('token', json.accessToken);\r",
+							"            console.log(\"✅ Token set!\");\r",
+							"        } else {\r",
+							"            console.error(\"❌ Login failed\", err);\r",
+							"        }\r",
+							"    });\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer  {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"lastName\": \"Owais\"\r\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/users/2",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"users",
+						"2"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						},
+						{
+							"key": "-Type'",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateUser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (!pm.environment.get(\"token\")) {\r",
+							"    console.log(\"🔐 Logging in to get new token...\");\r",
+							"\r",
+							"    pm.sendRequest({\r",
+							"        url: 'https://dummyjson.com/auth/login',\r",
+							"        method: 'POST',\r",
+							"        header: { 'Content-Type': 'application/json' },\r",
+							"        body: {\r",
+							"            mode: 'raw',\r",
+							"            raw: JSON.stringify({\r",
+							"                username: 'emilys',\r",
+							"                password: 'emilyspass'\r",
+							"            })\r",
+							"        }\r",
+							"    }, function (err, res) {\r",
+							"        if (!err) {\r",
+							"            let json = res.json();\r",
+							"            pm.environment.set('token', json.accessToken);\r",
+							"            console.log(\"✅ Token set!\");\r",
+							"        } else {\r",
+							"            console.error(\"❌ Login failed\", err);\r",
+							"        }\r",
+							"    });\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer  {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"lastName\": \"AunchiThai\"\r\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/users/1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"users",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteUser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (!pm.environment.get(\"token\")) {\r",
+							"    console.log(\"🔐 Logging in to get new token...\");\r",
+							"\r",
+							"    pm.sendRequest({\r",
+							"        url: 'https://dummyjson.com/auth/login',\r",
+							"        method: 'POST',\r",
+							"        header: { 'Content-Type': 'application/json' },\r",
+							"        body: {\r",
+							"            mode: 'raw',\r",
+							"            raw: JSON.stringify({\r",
+							"                username: 'emilys',\r",
+							"                password: 'emilyspass'\r",
+							"            })\r",
+							"        }\r",
+							"    }, function (err, res) {\r",
+							"        if (!err) {\r",
+							"            let json = res.json();\r",
+							"            pm.environment.set('token', json.accessToken);\r",
+							"            console.log(\"✅ Token set!\");\r",
+							"        } else {\r",
+							"            console.error(\"❌ Login failed\", err);\r",
+							"        }\r",
+							"    });\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/users/3",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"users",
+						"3"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
